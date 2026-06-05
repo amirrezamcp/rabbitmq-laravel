@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProductCreated;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -20,7 +21,9 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $product = Product::created($request->only(['title', 'image']));
+        $product = Product::create($request->only(['title', 'image']));
+
+        ProductCreated::dispatch($product->toArray());
 
         return response($product);
     }
@@ -38,8 +41,9 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $product = Product::finde($id);
+        $product = Product::find($id);
         $product->update($request->only(['title', 'image']));
+        return response($product);
     }
 
     /**
@@ -47,7 +51,9 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $product = Product::destroy($id);
+        $product = Product::find($id);
+        $product->delete($id);
+
         return response(null);
     }
 }
