@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ProductCreated;
+use App\Jobs\ProductDeleted;
+use App\Jobs\ProductUpdated;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -43,6 +45,9 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
         $product->update($request->only(['title', 'image']));
+
+        ProductUpdated::dispatch($product->toArray());
+
         return response($product);
     }
 
@@ -51,8 +56,9 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $product = Product::find($id);
-        $product->delete($id);
+        Product::destroy($id);
+
+        ProductDeleted::dispatch($id);
 
         return response(null);
     }
