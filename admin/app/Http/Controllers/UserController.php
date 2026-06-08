@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\TestRabbitMQJob;
+use App\Jobs\SendUserLoginEvent;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -12,10 +12,13 @@ class UserController extends Controller
     {
         $user = User::inRandomOrder()->first();
         $photoUrl = "dasdasdadasdadsfgfhgfhfh";
-TestRabbitMQJob::dispatch($user, $photoUrl);
+
+        SendUserLoginEvent::dispatch($user->id, $photoUrl);
+
         return response([
             'id' => $user->id,
             'path'=> $photoUrl,
+            'message' => 'Event dispatched to RabbitMQ with routing key: user.created'
         ]);
     }
 }
